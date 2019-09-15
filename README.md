@@ -1,3 +1,16 @@
+## QR Sync Admin Web
+This is the new web interface for the QR Sync Admin app.
+
+The goal of this admin app is for controlling multiple computers using a quick and easy QR scanning sync process.
+
+The admin app will show a QR Scanner which can scan a QR on the client website.
+
+This adds the client to the client list.
+
+After scanning clients the admin app can be used to redirect all of them to the same website.
+
+Further sync and control features coming soon.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
