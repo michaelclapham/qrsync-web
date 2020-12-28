@@ -3,16 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ionic/react": "^5.5.2",
     "@types/jest": "26.0.16",
     "@types/node": "12.7.5",
     "@types/react": "17.0.0",
     "@types/react-dom": "17.0.0",
+    "eslint-utils": "^1.4.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "react-qr-code": "^1.0.3",
     "react-qr-reader": "^2.2.1",
     "react-scripts": "4.0.1",
-    "typescript": "3.6.3",
-    "eslint-utils": "^1.4.1"
+    "typescript": "3.6.3"
   },
   "devDependencies": {
     "@types/react-qr-reader": "^2.1.2"

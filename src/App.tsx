@@ -2,13 +2,16 @@ import React from 'react';
 import logo_fg from './logo_fg1.svg';
 import logo_bg from './sync_arrows1.svg';
 import './App.css';
-import QrReader from 'react-qr-reader';
 import { Client } from './Client';
+import { IonButton, IonModal } from '@ionic/react';
+import { ScanPeerModal } from './feature/scan-peer/ScanPeerModal';
+import QRCode from "react-qr-code";
 
 interface AppState {
   result: string;
   goToURL: string;
   clientMap: Record<string, Client>;
+  scanModalOpen: boolean;
 }
 
 export default class App extends React.Component<{}, AppState> {
@@ -18,34 +21,20 @@ export default class App extends React.Component<{}, AppState> {
     this.state = {
       result: "",
       goToURL: "",
-      clientMap: {}
+      clientMap: {},
+      scanModalOpen: false
     };
-  }
-
-  handleScan = (result: string | null) => {
-    if (result) {
-      this.setState({ result: result });
-      if (!this.state.clientMap[result]) {
-        const clientId = result;
-        fetch(`https://jungleapp.co.uk:4001/api/client/${clientId}`).then((res) => {
-          res.json().then((newClient: Client) => {
-            const newClientMap = { ...this.state.clientMap, [clientId]: newClient };
-            this.setState({ clientMap: newClientMap });
-          });
-        });
-      }
-    } else {
-      this.setState({ result: "No Result" });
-    }
-  }
-
-  handleError = () => {
-
   }
 
   handleUrlSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 
   };
+
+  onScanPeer = (client: Client) => {
+    this.setState({ clientMap: { ...this.state.clientMap, client } })
+  }
+
+  closeScannerModal = () => this.setState({ scanModalOpen: false });
 
   render() {
     return (
@@ -59,12 +48,7 @@ export default class App extends React.Component<{}, AppState> {
             <h1 className="app-title">QR Sync</h1>
           </div>
         </header>
-        <QrReader
-          delay={300}
-          onError={this.handleError}
-          onScan={this.handleScan}
-          style={{ width: '60vmin', maxWidth: '250px', margin: 'auto', position: 'relative', marginTop: 30 }}
-        ></QrReader>
+        <QRCode value="bleh"></QRCode>
         <p>Result: {this.state.result}</p>
         <form onSubmit={this.handleUrlSubmit}>
           <label>
@@ -82,6 +66,12 @@ export default class App extends React.Component<{}, AppState> {
             </li>)
           }
         </ul>
+        <IonButton onClick={() => this.setState({ scanModalOpen: true })}>
+          Open Scanner
+        </IonButton>
+        <IonModal isOpen={this.state.scanModalOpen} onDidDismiss={this.closeScannerModal}>
+          <ScanPeerModal onScanPeer={this.onScanPeer} onCloseClick={this.closeScannerModal}></ScanPeerModal>
+        </IonModal>
       </div>
     );
   }
