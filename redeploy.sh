@@ -1,4 +1,4 @@
 #!/bin/bash
 git pull
-npm install
+npx yarn install
 npm run build
