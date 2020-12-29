@@ -39,7 +39,7 @@ export default class App extends React.Component<{}, AppState> {
   };
 
   connectToWebsocket = () => {
-    this.ws = new WebSocket("ws://192.168.1.5:4001/v1/ws");
+    this.ws = new WebSocket("ws://qrsync.org:4010/api/v1/ws");
     this.ws.onmessage = (event) => {
       console.log("ws event", event);
       const msg: ServerTypes.Msg = JSON.parse(event.data);
