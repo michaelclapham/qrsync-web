@@ -1,23 +1,14 @@
 import { IonIcon } from "@ionic/react";
 import React from "react";
 import QrReader from "react-qr-reader";
-import { Client } from "../../Client";
 import { close } from 'ionicons/icons'
 
-export interface ScanPeerModalProps {
-    onScanPeer: (client: Client) => void;
+export interface ScanClientModalProps {
+    onScanClient: (clientId: string | null) => void;
     onCloseClick: () => void;
 }
 
-export class ScanPeerModal extends React.Component<ScanPeerModalProps, { result: string }> {
-
-    handleScan = async (result: string | null) => {
-        if (result) {
-            const res = await fetch(`https://jungleapp.co.uk:4001/api/client/${result}`);
-            const newClient = await res.json();
-            this.props.onScanPeer(newClient);
-        }
-    }
+export class ScanClientModal extends React.Component<ScanClientModalProps, { result: string }> {
 
     handleError = () => {
 
@@ -27,13 +18,13 @@ export class ScanPeerModal extends React.Component<ScanPeerModalProps, { result:
         return <div>
             <div style={{display: "flex"}}>
                 <h1>Scan another device with QRSync open</h1>
-                <IonIcon icon={close}></IonIcon>
+                <IonIcon icon={close} onClick={this.props.onCloseClick} style={{width: 40, height: 40, margin: 40}}></IonIcon>
             </div>
             
             <QrReader
                 delay={300}
                 onError={this.handleError}
-                onScan={this.handleScan}
+                onScan={this.props.onScanClient}
                 style={{ width: '60vmin', maxWidth: '250px', margin: 'auto', position: 'relative', marginTop: 30 }}
             ></QrReader>
         </div>;

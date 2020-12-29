@@ -1,12 +1,19 @@
 body {
   --ion-color-primary: #107C76;
   --ion-background-color: rgb(39, 39, 39);
+  --ion-text-color: white;
+  --ion-text-color-rgb: 255, 255, 255;
+}
+
+.modal-wrapper {
+  color: white;
 }
 
 .App {
   text-align: center;
   height: 100vh;
   background-color: #282c34;
+  color: white;
 }
 
 .app-title-container {

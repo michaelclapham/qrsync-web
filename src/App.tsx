@@ -3,7 +3,7 @@ import logo_fg from './logo_fg1.svg';
 import logo_bg from './sync_arrows1.svg';
 import './App.css';
 import { IonButton, IonModal } from '@ionic/react';
-import { ScanPeerModal } from './feature/scan-peer/ScanPeerModal';
+import { ScanClientModal } from './feature/scan-peer/ScanClientModal';
 import QRCode from "react-qr-code";
 import { ServerTypes } from './ServerTypes';
 import { Client } from './Client';
@@ -13,10 +13,13 @@ interface AppState {
   goToURL: string;
   clientMap: Record<string, Client>;
   scanModalOpen: boolean;
-  ourClientId: string;
+  ourClientId: string | null;
+  sessionId: string | null;
 }
 
 export default class App extends React.Component<{}, AppState> {
+  ws: WebSocket | undefined;
+  clientIdsForUpcomingSession: string[] = [];
 
   constructor(props: {}) {
     super(props);
@@ -25,7 +28,8 @@ export default class App extends React.Component<{}, AppState> {
       goToURL: "",
       clientMap: {},
       scanModalOpen: false,
-      ourClientId: ""
+      ourClientId: null,
+      sessionId: null
     };
     this.connectToWebsocket();
   }
@@ -35,21 +39,44 @@ export default class App extends React.Component<{}, AppState> {
   };
 
   connectToWebsocket = () => {
-    const ws = new WebSocket("ws://localhost:4001/v1/ws");
-    ws.onmessage = (event) => {
+    this.ws = new WebSocket("ws://192.168.1.5:4001/v1/ws");
+    this.ws.onmessage = (event) => {
       console.log("ws event", event);
       const msg: ServerTypes.Msg = JSON.parse(event.data);
       this.onReceiveWebsocketMsg(msg);
     }
   }
 
+  sendWsMsg = (msg: ServerTypes.Msg) => {
+    if (this.ws && this.ws.readyState === this.ws.OPEN) {
+      const data = JSON.stringify(msg);
+      this.ws.send(data);
+    }
+  }
+
   onReceiveWebsocketMsg = (msg: ServerTypes.Msg) => {
     if (msg.type) {
       switch (msg.type) {
-        case "ClientConnect": return this.onClientConnectMsg(msg)
+        case "ClientConnect": return this.onClientConnectMsg(msg);
+        case "ClientJoinedSession": return this.onClientJoinedSessionMsg(msg);
       }
     } else {
       console.warn("No message type ", msg);
+    }
+  }
+
+  onClientJoinedSessionMsg = (msg: ServerTypes.ClientJoinedSessionMsg) => {
+    if (msg.clientId === this.state.ourClientId) {
+      this.setState({ sessionId: msg.sessionId });
+      if (this.clientIdsForUpcomingSession) {
+        this.clientIdsForUpcomingSession.forEach((clientId) => {
+          this.sendWsMsg({
+            type: "AddSessionClient",
+            addClientId: clientId,
+            sessionId: msg.sessionId
+          });
+        });
+      }
     }
   }
 
@@ -57,8 +84,22 @@ export default class App extends React.Component<{}, AppState> {
     this.setState({ ourClientId: msg.client.id });
   }
 
-  onScanPeer = (client: Client) => {
-    this.setState({ clientMap: { ...this.state.clientMap, client } })
+  onScanClient = (clientId: string | null) => {
+    if (clientId) {
+      console.log("Client id scanned ", clientId);
+      if (!this.state.sessionId) {
+        this.clientIdsForUpcomingSession.push(clientId);
+        this.sendWsMsg({
+          type: "CreateSession"
+        });
+      } else {
+        this.sendWsMsg({
+          type: "AddSessionClient",
+          addClientId: clientId,
+          sessionId: this.state.sessionId
+        });
+      }
+    }
   }
 
   closeScannerModal = () => this.setState({ scanModalOpen: false });
@@ -75,15 +116,8 @@ export default class App extends React.Component<{}, AppState> {
             <h1 className="app-title">QR Sync</h1>
           </div>
         </header>
-        { this.state.ourClientId.length > 0 ? <QRCode value={this.state.ourClientId}></QRCode> : null }
-        <p>Result: {this.state.result}</p>
-        <form onSubmit={this.handleUrlSubmit}>
-          <label>
-            Go To URL:
-          <textarea value={this.state.goToURL} onChange={(event) => this.setState({ goToURL: event.target.value })} />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
+        { this.state.ourClientId ? <QRCode value={this.state.ourClientId}></QRCode> : null }
+        <p>Session Id: {this.state.sessionId}</p>
         <h2>Client List:</h2>
         <ul>
           {
@@ -97,7 +131,7 @@ export default class App extends React.Component<{}, AppState> {
           Open Scanner
         </IonButton>
         <IonModal isOpen={this.state.scanModalOpen} onDidDismiss={this.closeScannerModal}>
-          <ScanPeerModal onScanPeer={this.onScanPeer} onCloseClick={this.closeScannerModal}></ScanPeerModal>
+          <ScanClientModal onScanClient={this.onScanClient} onCloseClick={this.closeScannerModal}></ScanClientModal>
         </IonModal>
       </div>
     );
