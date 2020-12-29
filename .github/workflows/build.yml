@@ -25,5 +25,5 @@ jobs:
         server: qrsync.org
         username: ftp
         password: ${{ secrets.ftp_password }}
-        local-dir: ./build
-        server-dir: /var/www/qrsync
+        local-dir: ./build/
+        server-dir: /var/www/qrsync/
