@@ -1,12 +1,11 @@
 import React from 'react';
-import logo_fg from './logo_fg1.svg';
-import logo_bg from './sync_arrows1.svg';
 import './App.css';
-import { IonButton, IonModal } from '@ionic/react';
-import { ScanClientModal } from './feature/scan-peer/ScanClientModal';
-import QRCode from "react-qr-code";
 import { ServerTypes } from './ServerTypes';
 import { Client } from './Client';
+import { Header } from './feature/header/Header';
+import { RouteComponentProps } from 'react-router-dom'
+import { SessionPage } from './feature/session/SessionPage';
+import { HomePage } from './feature/home/HomePage';
 
 interface AppState {
   result: string;
@@ -17,11 +16,11 @@ interface AppState {
   sessionId: string | null;
 }
 
-export default class App extends React.Component<{}, AppState> {
+class App extends React.Component<RouteComponentProps, AppState> {
   ws: WebSocket | undefined;
   clientIdsForUpcomingSession: string[] = [];
 
-  constructor(props: {}) {
+  constructor(props: RouteComponentProps) {
     super(props);
     this.state = {
       result: "",
@@ -34,12 +33,12 @@ export default class App extends React.Component<{}, AppState> {
     this.connectToWebsocket();
   }
 
-  handleUrlSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  handleUrlSubmit = () => {
 
   };
 
   connectToWebsocket = () => {
-    this.ws = new WebSocket("ws://192.168.1.5:4001/v1/ws");
+    this.ws = new WebSocket("wss://qrsync.org/api/v1/ws");
     this.ws.onmessage = (event) => {
       console.log("ws event", event);
       const msg: ServerTypes.Msg = JSON.parse(event.data);
@@ -77,6 +76,7 @@ export default class App extends React.Component<{}, AppState> {
           });
         });
       }
+      this.props.history.push("/session");
     }
   }
 
@@ -102,38 +102,19 @@ export default class App extends React.Component<{}, AppState> {
     }
   }
 
-  closeScannerModal = () => this.setState({ scanModalOpen: false });
 
   render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <div className="app-title-container">
-            <div className="app-logo-container">
-              <img src={logo_fg} className="app-logo-fg" alt="logo" />
-              <img src={logo_bg} className="app-logo-bg" alt="logo-bg" />
-            </div>
-            <h1 className="app-title">QR Sync</h1>
-          </div>
-        </header>
-        { this.state.ourClientId ? <QRCode value={this.state.ourClientId}></QRCode> : null }
-        <p>Session Id: {this.state.sessionId}</p>
-        <h2>Client List:</h2>
-        <ul>
-          {
-            Object.keys(this.state.clientMap).map((clientId) => <li>
-              <span>Id: {clientId}</span>
-              <span>Name: {this.state.clientMap[clientId].name}</span>
-            </li>)
-          }
-        </ul>
-        <IonButton onClick={() => this.setState({ scanModalOpen: true })}>
-          Open Scanner
-        </IonButton>
-        <IonModal isOpen={this.state.scanModalOpen} onDidDismiss={this.closeScannerModal}>
-          <ScanClientModal onScanClient={this.onScanClient} onCloseClick={this.closeScannerModal}></ScanClientModal>
-        </IonModal>
-      </div>
-    );
+    return <div className="App">
+      <Header></Header>
+      {this.state.sessionId ? 
+        <SessionPage sessionId={this.state.sessionId}></SessionPage> :
+        <HomePage
+          ourClientId={this.state.ourClientId}
+          onScanClient={this.onScanClient}
+        ></HomePage>
+      }
+    </div>
   }
 }
+
+export default App;
