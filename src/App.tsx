@@ -39,7 +39,7 @@ export default class App extends React.Component<{}, AppState> {
   };
 
   connectToWebsocket = () => {
-    this.ws = new WebSocket("ws://qrsync.org:4010/api/v1/ws");
+    this.ws = new WebSocket("wss://qrsync.org/api/v1/ws");
     this.ws.onmessage = (event) => {
       console.log("ws event", event);
       const msg: ServerTypes.Msg = JSON.parse(event.data);
@@ -86,6 +86,7 @@ export default class App extends React.Component<{}, AppState> {
 
   onScanClient = (clientId: string | null) => {
     if (clientId) {
+      this.closeScannerModal();
       console.log("Client id scanned ", clientId);
       if (!this.state.sessionId) {
         this.clientIdsForUpcomingSession.push(clientId);
