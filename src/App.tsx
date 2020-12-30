@@ -85,6 +85,7 @@ export default class App extends React.Component<{}, AppState> {
   }
 
   onScanClient = (clientId: string | null) => {
+    this.setState({result: "" + clientId});
     if (clientId) {
       this.closeScannerModal();
       console.log("Client id scanned ", clientId);
@@ -117,8 +118,12 @@ export default class App extends React.Component<{}, AppState> {
             <h1 className="app-title">QR Sync</h1>
           </div>
         </header>
-        { this.state.ourClientId ? <QRCode value={this.state.ourClientId}></QRCode> : null }
+        { this.state.ourClientId ?
+          <><QRCode value={this.state.ourClientId}></QRCode>
+            <p>Client Id: {this.state.ourClientId}</p></>
+        : null }
         <p>Session Id: {this.state.sessionId}</p>
+        <p>Result: {this.state.result}</p>
         <h2>Client List:</h2>
         <ul>
           {
