@@ -1,0 +1,28 @@
+on: push
+name: 🚀 Deploy website on push
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v2.3.2
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '12'
+    - run: npm install
+    - run: npm run build
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@4.0.0
+      with:
+        server: qrsync.org
+        username: ${{ secrets.ftp_user }}
+        password: ${{ secrets.ftp_password }}
+        local-dir: ./build/

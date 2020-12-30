@@ -85,6 +85,7 @@ class App extends React.Component<RouteComponentProps, AppState> {
   }
 
   onScanClient = (clientId: string | null) => {
+    this.setState({result: "" + clientId});
     if (clientId) {
       console.log("Client id scanned ", clientId);
       if (!this.state.sessionId) {

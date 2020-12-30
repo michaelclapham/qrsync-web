@@ -14,6 +14,13 @@ export class HomePage extends React.Component<HomePageProps, { scanModalOpen: bo
 
     closeScannerModal = () => this.setState({ scanModalOpen: false });
 
+    onScan = (result: string | null) => {
+        if (result) {
+            this.closeScannerModal();
+            this.props.onScanClient(result);
+        }
+    }
+
     render() {
         return <div>
             {this.props.ourClientId ? [
@@ -24,7 +31,7 @@ export class HomePage extends React.Component<HomePageProps, { scanModalOpen: bo
                 Open Scanner
             </IonButton>
             <IonModal isOpen={this.state.scanModalOpen} onDidDismiss={this.closeScannerModal}>
-                <ScanClientModal onScanClient={this.props.onScanClient} onCloseClick={this.closeScannerModal}></ScanClientModal>
+                <ScanClientModal onScanClient={this.onScan} onCloseClick={this.closeScannerModal}></ScanClientModal>
             </IonModal>
         </div>
     }

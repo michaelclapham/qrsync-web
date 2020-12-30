@@ -1,4 +1,5 @@
-#!bin/bash
+#!/bin/bash
 git pull
-yarn install
+chmod a+x ./redeploy.sh
+npx yarn install
 npm run build
