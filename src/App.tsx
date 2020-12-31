@@ -3,7 +3,6 @@ import './App.css';
 import { ServerTypes } from './ServerTypes';
 import { Client } from './Client';
 import { Header } from './feature/header/Header';
-import { RouteComponentProps } from 'react-router-dom'
 import { SessionPage } from './feature/session/SessionPage';
 import { HomePage } from './feature/home/HomePage';
 
@@ -16,11 +15,11 @@ interface AppState {
   sessionId: string | null;
 }
 
-class App extends React.Component<RouteComponentProps, AppState> {
+class App extends React.Component<{}, AppState> {
   ws: WebSocket | undefined;
   clientIdsForUpcomingSession: string[] = [];
 
-  constructor(props: RouteComponentProps) {
+  constructor(props: {}) {
     super(props);
     this.state = {
       result: "",
@@ -76,7 +75,6 @@ class App extends React.Component<RouteComponentProps, AppState> {
           });
         });
       }
-      this.props.history.push("/session");
     }
   }
 
