@@ -1,7 +1,7 @@
 import { IonIcon, IonInput, IonItem } from "@ionic/react";
 import React from "react";
 import QrReader from "react-qr-reader";
-import { close } from 'ionicons/icons'
+import { close } from 'ionicons/icons';
 
 export interface ScanClientModalProps {
     onScanClient: (clientId: string | null) => void;
