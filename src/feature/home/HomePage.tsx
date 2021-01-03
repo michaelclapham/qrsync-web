@@ -24,8 +24,8 @@ export class HomePage extends React.Component<HomePageProps, { scanModalOpen: bo
     render() {
         return <div>
             {this.props.ourClientId ? [
-                <QRCode value={this.props.ourClientId}></QRCode>,
-                <p>Client id {this.props.ourClientId}</p>
+                <QRCode key="0" value={this.props.ourClientId}></QRCode>,
+                <p key="1">Client id {this.props.ourClientId}</p>
             ] : null}
             <IonButton onClick={() => this.setState({ scanModalOpen: true })}>
                 Open Scanner

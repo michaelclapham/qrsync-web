@@ -1,6 +1,6 @@
 import React from "react";
 import { ServerTypes } from "../../ServerTypes";
-import { IonIcon, IonInput } from "@ionic/react";
+import { IonButton, IonIcon, IonInput } from "@ionic/react";
 import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
@@ -10,6 +10,7 @@ export interface SessionPageProps {
     sessionOwnerId: string | null;
     clientMap: Record<string, ServerTypes.Client>;
     wsClient: WSClient;
+    onLeaveSession: () => any;
 }
 
 export interface SessionPageState {
@@ -33,6 +34,7 @@ export class SessionPage extends React.Component<SessionPageProps, SessionPageSt
 
     render() {
         return <div>
+            <IonButton onClick={this.props.onLeaveSession}>Leave Session</IonButton>
             <h1>Session Page</h1>
             <p>{this.props.sessionId}</p>
             <SessionActionsList

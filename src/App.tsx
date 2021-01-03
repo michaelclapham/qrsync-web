@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { ServerTypes } from './ServerTypes';
 import { Header } from './feature/header/Header';
-import { OwnerAction, SessionPage } from './feature/session/SessionPage';
+import { SessionPage } from './feature/session/SessionPage';
 import { HomePage } from './feature/home/HomePage';
 import { WSClient } from './WSClient';
 
@@ -83,8 +83,9 @@ class App extends React.Component<{}, AppState> {
 
   }
 
-  onOwnerAction = (action: OwnerAction) => {
-
+  onLeaveSession = () => {
+    this.wsClient.leaveSession();
+    this.setState({ sessionId: null });
   }
 
   render() {
@@ -96,10 +97,10 @@ class App extends React.Component<{}, AppState> {
           sessionId={this.state.sessionId}
           clientMap={this.state.clientMap}
           sessionOwnerId={this.state.sessionOwnerId}
-          ourClientId={this.state.ourClientId}
+          onLeaveSession={this.onLeaveSession}
         ></SessionPage> :
         <HomePage
-          ourClientId={this.state.ourClientId}
+          ourClientId={this.wsClient.getId()}
           onScanClient={this.onScanClient}
         ></HomePage>
       }
