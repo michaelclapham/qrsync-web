@@ -30,7 +30,7 @@ class App extends React.Component<{}, AppState> {
       sessionId: null,
       sessionOwnerId: null
     };
-    this.wsClient = new WSClient("wss://qrsync.org/api/v1/ws");
+    this.wsClient = new WSClient("ws://localhost:4010/api/v1/ws");
     this.wsClient.addMessageHandler("main", this.onReceiveWebsocketMsg);
   }
 

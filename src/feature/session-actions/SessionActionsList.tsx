@@ -38,8 +38,9 @@ export class SessionActionsList extends React.Component<SessionActionsListProps,
     };
 
     render() {
-        
+        console.log("User is session owner", this.props.userIsSessionOwner);
         return <div className="session-actions">
+            <h1>User is session owner? {this.props.userIsSessionOwner ? "yes" : "no"}</h1>
             {sessionActions.filter((action) => this.props.userIsSessionOwner || !action.ownerOnly)
             .map((action) => this.renderActionButton(action))
             }
@@ -50,7 +51,9 @@ export class SessionActionsList extends React.Component<SessionActionsListProps,
     }
 
     renderActionButton = (action: SessionActionSummary) => {
-        <div key={action.name} onClick={() => this.onActionClicked(action)}>
+        return <div key={action.name} onClick={() => this.onActionClicked(action)}
+            style={{borderWidth: 1, borderStyle: "solid", borderColor: "white", borderRadius: 20, display: "inline-block"}}
+        >
             <h2>{action.name}</h2>
             <IonIcon icon={action.ionicon} style={{width: 200, height: 200}}></IonIcon>
         </div>

@@ -10,16 +10,21 @@ export class WSClient {
     clientName: string = "";
 
     constructor(private url: string) {
-        this.connect(url);
+        this.ws = this.connect(url);
     }
 
-    private connect(url: string) {
+    private connect(url: string): WebSocket {
+        let prevClientId = localStorage.getItem("prevClientId");
+        if (prevClientId) {
+            url += "?clientId=" + prevClientId;
+        }
         this.ws = new WebSocket(url);
         this.ws.onmessage = (event) => {
             console.log("ws event", event);
             const msg: ServerTypes.Msg = JSON.parse(event.data);
             this.onReceiveWebsocketMsg(msg);
         }
+        return this.ws;
     }
 
     public addMessageHandler(id: string, handler: WSMessageHandler) {
@@ -28,6 +33,7 @@ export class WSClient {
 
     public sendMessage(msg: ServerTypes.Msg) {
         if (this.ws && this.ws.readyState === this.ws.OPEN) {
+            console.log("Sending message", msg);
             this.ws.send(JSON.stringify(msg));
         }
     }
@@ -50,10 +56,12 @@ export class WSClient {
     public leaveSession() {
         this.ws.close();
         localStorage.removeItem("prevSessionId");
+        localStorage.removeItem("prevClientId");
         this.connect(this.url);
     }
 
     onReceiveWebsocketMsg = (msg: ServerTypes.Msg) => {
+        console.log("Received msg ", msg);
         this.allMessages.push(msg);
         if (msg.type === "ClientConnect") {
             this.clientId = msg.client.id;
@@ -69,6 +77,7 @@ export class WSClient {
         }
         if (msg.type === "ClientJoinedSession" && msg.clientId === this.clientId) {
             localStorage.setItem("prevSessionId", msg.sessionId);
+            localStorage.setItem("prevClientId", msg.clientId);
         }
         for (let handlerId in this.messageHandlerMap) {
             let handler = this.messageHandlerMap[handlerId];

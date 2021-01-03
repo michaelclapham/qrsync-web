@@ -1,6 +1,6 @@
 import React from "react";
 import { ServerTypes } from "../../ServerTypes";
-import { IonButton, IonIcon, IonInput } from "@ionic/react";
+import { IonButton } from "@ionic/react";
 import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
@@ -20,23 +20,26 @@ export interface SessionPageState {
 
 export class SessionPage extends React.Component<SessionPageProps, SessionPageState> {
 
+    state = {
+        urlInput: "",
+        sessionMessages: []
+    } as SessionPageState;
+
     constructor(props: SessionPageProps) {
         super(props);
         props.wsClient.addMessageHandler("session_page", this.onWebsocketMessage);
     }
-
-    state = {
-        urlInput: "",
-        sessionMessages: []
-    };
-
-    
 
     render() {
         return <div>
             <IonButton onClick={this.props.onLeaveSession}>Leave Session</IonButton>
             <h1>Session Page</h1>
             <p>{this.props.sessionId}</p>
+            <h2>Session Messages</h2>
+            <ul>
+                {this.state.sessionMessages.map((sessionMsg) => (<li>{sessionMsg.text}</li>))}
+            </ul>
+            <h2>Session Actions:</h2>
             <SessionActionsList
                 wsClient={this.props.wsClient}
                 userIsSessionOwner={this.props.sessionOwnerId === this.props.wsClient.getId()}
@@ -44,42 +47,21 @@ export class SessionPage extends React.Component<SessionPageProps, SessionPageSt
         </div>
     }
 
-    renderOwnerActions = () => {
-        if (this.props.ourClientId === this.props.sessionOwnerId) {
-            return <div>
-                {this.ownerActions.map((ownerAction) => this.renderOwnerAction(ownerAction))}
-            </div>
-        }
-    }
-
-    renderOwnerAction = (ownerAction: OwnerAction) => {
-        return <div key={ownerAction.name} onClick={() => this.ownerActionClicked(ownerAction)}>
-            <h2>{ownerAction.name}</h2>
-            <IonIcon icon={ownerAction.ionicon} style={{width: 200, height: 200}}></IonIcon>
-            {ownerAction.name === "Open Website" ? 
-                <IonInput value={this.state.urlInput} placeholder="Enter URL to open on other computers"
-                    onIonChange={e => this.setState({ urlInput: e.detail.value! })}></IonInput> : null}
-        </div>
-    }
-
-    ownerActionClicked = (ownerAction: OwnerAction) => {
-        if (ownerAction.name === "Open Website") {
-            this.props.wsClient.sendMessage({
-                type: "BroadcastToSession",
-                payload: {
-                    ownerActionName: "Open Website",
-                    openURL: this.state.urlInput
-                }
-            });
-        }
-    }
-
     onWebsocketMessage = (msg: ServerTypes.Msg) => {
-        if (msg.type === "BroadcastFromSession" && msg.senderId !== this.props.ourClientId) {
-            if (msg.payload.ownerActionName === "Open Website") {
-                if (msg.payload.openURL) {
-                    console.log("Opening url??", msg.payload.openURL);
-                    window.open(msg.payload.openURL, "_blank");
+        if (msg.type === "BroadcastFromSession") {
+            let payload: SessionMessage = msg.payload;
+            if (payload.type && payload.text) {
+                let sessionMsgs: SessionMessage[] = [];
+                if (this.state.sessionMessages) {
+                    sessionMsgs = this.state.sessionMessages;
+                }
+                sessionMsgs.push(payload);
+                this.setState({ sessionMessages: sessionMsgs});
+            }
+            if (msg.senderId !== this.props.wsClient.getId()) {
+                if (payload.type === "OPEN_WEBSITE") {
+                    console.log("Opening url ", payload.text);
+                    window.open(payload.text, "_blank");
                 }
             }
         }

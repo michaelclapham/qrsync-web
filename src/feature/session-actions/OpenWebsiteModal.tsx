@@ -5,6 +5,10 @@ import { SessionActionModal } from "./SessionActionModal";
 
 export class OpenWebsiteModal extends SessionActionModal<{}, { urlInput: string }> {
     
+    state = {
+        urlInput: ""
+    };
+
     onOpenWebsiteClick = () => {
         let id = this.props.wsClient.getId();
         if (this.props.wsClient && id != null) {
@@ -15,9 +19,7 @@ export class OpenWebsiteModal extends SessionActionModal<{}, { urlInput: string 
                 senderName: this.props.wsClient.getName()
             };
             this.props.wsClient.sendMessage({
-                type: "BroadcastFromSession",
-                fromSessionOwner: false,
-                senderId: id,
+                type: "BroadcastToSession",
                 payload: sessionMsg
             });
         }
