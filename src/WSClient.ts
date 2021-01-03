@@ -7,6 +7,7 @@ export class WSClient {
     messageHandlerMap: {[id: string]: WSMessageHandler} = {};
     allMessages: ServerTypes.Msg[] = [];
     clientId: string | null = null;
+    clientName: string = "";
 
     constructor(url: string) {
         this.ws = new WebSocket(url);
@@ -25,6 +26,21 @@ export class WSClient {
         if (this.ws && this.ws.readyState === this.ws.OPEN) {
             this.ws.send(JSON.stringify(msg));
         }
+    }
+
+    public getId(): string | null {
+        return this.clientId;
+    }
+
+    public getName(): string {
+        return this.clientName;
+    }
+
+    public setName(name: string) {
+        this.sendMessage({
+            type: "UpdateClient",
+            name: name
+        });
     }
 
     onReceiveWebsocketMsg = (msg: ServerTypes.Msg) => {

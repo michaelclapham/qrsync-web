@@ -1,49 +1,44 @@
 import React from "react";
 import { ServerTypes } from "../../ServerTypes";
-import { globeOutline } from 'ionicons/icons';
 import { IonIcon, IonInput } from "@ionic/react";
 import { WSClient } from "../../WSClient";
+import { SessionMessage } from "./SessionMessage";
+import { SessionActionsList } from "../session-actions/SessionActionsList";
 
 export interface SessionPageProps {
     sessionId: string | null;
     sessionOwnerId: string | null;
     clientMap: Record<string, ServerTypes.Client>;
-    ourClientId: string | null;
     wsClient: WSClient;
-}
-
-export interface OwnerAction {
-    name: string,
-    ionicon: string
 }
 
 export interface SessionPageState {
     urlInput: string;
+    sessionMessages: SessionMessage[];
 }
 
 export class SessionPage extends React.Component<SessionPageProps, SessionPageState> {
 
-    constructor(props) {
+    constructor(props: SessionPageProps) {
         super(props);
-        (props as SessionPageProps).wsClient.addMessageHandler("session_page", this.onWebsocketMessage);
+        props.wsClient.addMessageHandler("session_page", this.onWebsocketMessage);
     }
 
     state = {
-        urlInput: ""
+        urlInput: "",
+        sessionMessages: []
     };
 
-    ownerActions: OwnerAction[] = [
-        {
-            name: "Open Website",
-            ionicon: globeOutline
-        }
-    ];
+    
 
     render() {
         return <div>
             <h1>Session Page</h1>
             <p>{this.props.sessionId}</p>
-            {this.renderOwnerActions()}
+            <SessionActionsList
+                wsClient={this.props.wsClient}
+                userIsSessionOwner={this.props.sessionOwnerId === this.props.wsClient.getId()}
+            ></SessionActionsList>
         </div>
     }
 
