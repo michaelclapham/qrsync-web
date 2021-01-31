@@ -19,7 +19,8 @@ jobs:
         node-version: '12'
     - run: npm install
     - run: npm run build
-    - run: ls -l
+    - run: sudo apt-get install tree
+    - run: tree build
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
       with:
