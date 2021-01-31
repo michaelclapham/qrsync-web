@@ -31,9 +31,6 @@ class App extends React.Component<{}, AppState> {
       sessionOwnerId: null
     };
     let wsUrl = "wss://qrsync.org/api/v1/ws";
-    if (window.location.hostname === "localhost") {
-      wsUrl = "ws://localhost:4010/api/v1/ws";
-    }
     this.wsClient = new WSClient(wsUrl);
     this.wsClient.addMessageHandler("main", this.onReceiveWebsocketMsg);
   }
