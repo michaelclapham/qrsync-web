@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import QRCode from "react-qr-code";
 import { IonButton, IonModal } from "@ionic/react";
 import { ScanClientModal } from "../scan-client/ScanClientModal";
+import { IntroSlides } from "../intro-slides/IntroSlides";
 
 export interface HomePageProps {
   ourClientId: string | null;
@@ -44,6 +45,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         </>
       )}
       <IonButton onClick={() => setScanModalOpen(true)}>Open Scanner</IonButton>
+      {scanModalOpen ? null : <IntroSlides></IntroSlides>}
       <IonModal isOpen={scanModalOpen} onDidDismiss={closeScannerModal}>
         <ScanClientModal
           onScanClient={onScan}
