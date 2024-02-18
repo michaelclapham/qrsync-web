@@ -1,39 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import QRCode from "react-qr-code";
 import { IonButton, IonModal } from "@ionic/react";
 import { ScanClientModal } from "../scan-client/ScanClientModal";
 
 export interface HomePageProps {
-    ourClientId: string | null;
-    onScanClient: (clientId: string | null) => any;
+  ourClientId: string | null;
+  onScanClient: (clientId: string | null) => any;
 }
 
-export class HomePage extends React.Component<HomePageProps, { scanModalOpen: boolean }> {
+export const HomePage: React.FC<HomePageProps> = ({
+  ourClientId,
+  onScanClient,
+}) => {
+  const [scanModalOpen, setScanModalOpen] = useState(false);
 
-    state = {} as any;
+  const closeScannerModal = () => {
+    console.log("Close scanner");
+    setScanModalOpen(false);
+  };
 
-    closeScannerModal = () => this.setState({ scanModalOpen: false });
-
-    onScan = (result: string | null) => {
-        if (result) {
-            this.closeScannerModal();
-            this.props.onScanClient(result);
-        }
+  const onScan = (result: string | null) => {
+    if (result) {
+      closeScannerModal();
+      onScanClient(result);
     }
+  };
 
-    render() {
-        return <div>
-            {this.props.ourClientId ? [
-                <QRCode key="0" value={this.props.ourClientId}></QRCode>,
-                <p key="1">Client id {this.props.ourClientId}</p>
-            ] : null}
-            <IonButton onClick={() => this.setState({ scanModalOpen: true })}>
-                Open Scanner
-            </IonButton>
-            <IonModal isOpen={this.state.scanModalOpen} onDidDismiss={this.closeScannerModal}>
-                <ScanClientModal onScanClient={this.onScan} onCloseClick={this.closeScannerModal}></ScanClientModal>
-            </IonModal>
-        </div>
-    }
-
-}
+  return (
+    <div
+      style={{
+        height: "100%",
+        margin: "30px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-start",
+        alignItems: "center",
+      }}
+    >
+      {ourClientId && (
+        <>
+          <QRCode key="0" value={ourClientId} />
+          <p key="1">Client id {ourClientId}</p>
+        </>
+      )}
+      <IonButton onClick={() => setScanModalOpen(true)}>Open Scanner</IonButton>
+      <IonModal isOpen={scanModalOpen} onDidDismiss={closeScannerModal}>
+        <ScanClientModal
+          onScanClient={onScan}
+          onCloseClick={closeScannerModal}
+        />
+      </IonModal>
+    </div>
+  );
+};

@@ -5,6 +5,7 @@ import { Header } from './feature/header/Header';
 import { SessionPage } from './feature/session/SessionPage';
 import { HomePage } from './feature/home/HomePage';
 import { WSClient } from './WSClient';
+import { IonApp } from '@ionic/react';
 
 interface AppState {
   result: string;
@@ -91,20 +92,22 @@ class App extends React.Component<{}, AppState> {
 
   render() {
     return <div className="App">
-      <Header></Header>
-      {this.state.sessionId ? 
-        <SessionPage
-          wsClient={this.wsClient}
-          sessionId={this.state.sessionId}
-          clientMap={this.state.clientMap}
-          sessionOwnerId={this.state.sessionOwnerId}
-          onLeaveSession={this.onLeaveSession}
-        ></SessionPage> :
-        <HomePage
-          ourClientId={this.wsClient.getId()}
-          onScanClient={this.onScanClient}
-        ></HomePage>
-      }
+      <IonApp>
+        <Header></Header>
+        {this.state.sessionId ? 
+          <SessionPage
+            wsClient={this.wsClient}
+            sessionId={this.state.sessionId}
+            clientMap={this.state.clientMap}
+            sessionOwnerId={this.state.sessionOwnerId}
+            onLeaveSession={this.onLeaveSession}
+          ></SessionPage> :
+          <HomePage
+            ourClientId={this.wsClient.getId()}
+            onScanClient={this.onScanClient}
+          ></HomePage>
+        }
+      </IonApp>
     </div>
   }
 }

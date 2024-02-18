@@ -1,50 +1,51 @@
 import { IonIcon, IonInput, IonItem } from "@ionic/react";
-import React from "react";
-import QrReader from "react-qr-reader";
-import { close } from 'ionicons/icons';
+import React, { useRef, useState } from "react";
+import { QrScanner } from "@yudiel/react-qr-scanner";
+import { close } from "ionicons/icons";
 
-export interface ScanClientModalProps {
-    onScanClient: (clientId: string | null) => void;
-    onCloseClick: () => void;
+interface ScanClientModalProps {
+  onScanClient: (clientId: string | null) => void;
+  onCloseClick: () => void;
 }
 
-export class ScanClientModal extends React.Component<ScanClientModalProps, { result: string, manualId: string }> {
+export const ScanClientModal: React.FC<ScanClientModalProps> = ({
+  onScanClient,
+  onCloseClick,
+}) => {
+  const [result, setResult] = useState("");
+  const [manualId, setManualId] = useState("");
 
-    state = {
-        result: "",
-        manualId: ""
-    };
+  const handleScan = (data: string | null) => {
+    setResult(data || "");
+    onScanClient(data);
+  };
 
-    handleError = () => {
-
-    }
-
-    handleScan = (data: string | null) => {
-        this.setState({ result: "" + data });
-        this.props.onScanClient(data);
-    }
-
-    setManualId = (text: string) => {
-        this.setState({ manualId: text });
-    }
-
-    render() {
-        return <div>
-            <div style={{ display: "flex" }}>
-                <h1>Scan another device with QRSync open</h1>
-                <IonIcon icon={close} onClick={this.props.onCloseClick} style={{ width: 40, height: 40, margin: 40 }}></IonIcon>
-            </div>
-            <IonItem>
-                <IonInput value={this.state.manualId} placeholder="Enter Manual Id" onIonChange={e => this.setManualId(e.detail.value!)}></IonInput>
-                <button onClick={() => this.props.onScanClient(this.state.manualId)}>Add Client</button>
-            </IonItem>
-            <QrReader
-                delay={300}
-                onError={this.handleError}
-                onScan={this.handleScan}
-                style={{ width: '60vmin', maxWidth: '250px', margin: 'auto', position: 'relative', marginTop: 30 }}
-            ></QrReader>
-        </div>;
-    }
-
-}
+  return (
+    <div>
+      <div style={{ display: "flex" }}>
+        <h1>Scan another device with QRSync open</h1>
+        <IonIcon
+          icon={close}
+          onClick={onCloseClick}
+          style={{ width: 40, height: 40, margin: 40 }}
+        ></IonIcon>
+      </div>
+      <IonItem>
+        <IonInput
+          value={manualId}
+          placeholder="Enter Manual Id"
+          onIonChange={(e) => setManualId(e.detail.value!)}
+        ></IonInput>
+        <button onClick={() => onScanClient(manualId)}>Add Client</button>
+      </IonItem>
+      <QrScanner
+        scanDelay={100}
+        tracker={true}
+        deviceId=""
+        hideCount={true}
+        onError={(error) => console.log("QrScanner error ", error?.message)}
+        onDecode={handleScan}
+      />
+    </div>
+  );
+};
