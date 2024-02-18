@@ -38,14 +38,16 @@ export const HomePage: React.FC<HomePageProps> = ({
         alignItems: "center",
       }}
     >
-      {ourClientId && (
-        <>
-          <QRCode key="0" value={ourClientId} />
-          <p key="1">Client id {ourClientId}</p>
-        </>
-      )}
-      <IonButton onClick={() => setScanModalOpen(true)}>Open Scanner</IonButton>
-      {scanModalOpen ? null : <IntroSlides></IntroSlides>}
+      <div style={{height: '50%', maxWidth: '600px'}}>
+        {ourClientId && (
+          <>
+            <QRCode key="0" value={ourClientId} size={100} />
+            <p key="1">Client id {ourClientId}</p>
+          </>
+        )}
+        <IonButton onClick={() => setScanModalOpen(true)}>Open Scanner</IonButton>
+      </div>
+      <IntroSlides style={{height: '50%', maxWidth: '600px'}}></IntroSlides>
       <IonModal isOpen={scanModalOpen} onDidDismiss={closeScannerModal}>
         <ScanClientModal
           onScanClient={onScan}
