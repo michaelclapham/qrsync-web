@@ -21,20 +21,26 @@ export const IntroSlides: React.FC<IntroSlidesProps> = ({ style }) => {
         infiniteLoop={true}
       >
         <div className="introSlide">
-          <img src={slide1} />
+          <img src={slide1} alt="A phone moving data to a laptop" />
           <p className="slideDescription">
             QR Sync allows you to sync notes and files between devices for free!
           </p>
         </div>
         <div className="introSlide">
-          <img src={slide2} />
+          <img
+            src={slide2}
+            alt="A phone and laptop both with the Qr sync website open"
+          />
           <p className="slideDescription">
             Open QR Sync on multiple devices, and scan one with the other to
             connect them.
           </p>
         </div>
         <div className="introSlide">
-          <img src={slide3} />
+          <img
+            src={slide3}
+            alt="Files and notes being moved from a phone to a laptop"
+          />
           <p className="slideDescription">
             Then you can move notes and files between them. Simple!
           </p>
