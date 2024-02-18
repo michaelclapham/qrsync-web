@@ -1,5 +1,5 @@
 import { IonIcon, IonInput, IonItem } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { QrScanner } from "@yudiel/react-qr-scanner";
 import { close } from "ionicons/icons";
 
