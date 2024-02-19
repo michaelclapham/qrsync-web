@@ -12,11 +12,9 @@ export const ScanClientModal: React.FC<ScanClientModalProps> = ({
   onScanClient,
   onCloseClick,
 }) => {
-  const [result, setResult] = useState("");
   const [manualId, setManualId] = useState("");
 
   const handleScan = (data: string | null) => {
-    setResult(data || "");
     onScanClient(data);
   };
 
