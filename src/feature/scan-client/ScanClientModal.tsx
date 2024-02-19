@@ -1,5 +1,5 @@
 import { IonIcon, IonInput, IonItem } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { QrScanner } from "@yudiel/react-qr-scanner";
 import { close } from "ionicons/icons";
 
@@ -12,11 +12,9 @@ export const ScanClientModal: React.FC<ScanClientModalProps> = ({
   onScanClient,
   onCloseClick,
 }) => {
-  const [result, setResult] = useState("");
   const [manualId, setManualId] = useState("");
 
   const handleScan = (data: string | null) => {
-    setResult(data || "");
     onScanClient(data);
   };
 
