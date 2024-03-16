@@ -1,6 +1,6 @@
 import React from "react";
 import { ServerTypes } from "../../ServerTypes";
-import { IonButton } from "@ionic/react";
+import { IonButton, IonPage } from "@ionic/react";
 import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
@@ -31,7 +31,7 @@ export class SessionPage extends React.Component<SessionPageProps, SessionPageSt
     }
 
     render() {
-        return <div>
+        return <IonPage>
             <IonButton onClick={this.props.onLeaveSession}>Leave Session</IonButton>
             <h1>Session Page</h1>
             <p>{this.props.sessionId}</p>
@@ -44,7 +44,7 @@ export class SessionPage extends React.Component<SessionPageProps, SessionPageSt
                 wsClient={this.props.wsClient}
                 userIsSessionOwner={this.props.sessionOwnerId === this.props.wsClient.getId()}
             ></SessionActionsList>
-        </div>
+        </IonPage>
     }
 
     onWebsocketMessage = (msg: ServerTypes.Msg) => {
