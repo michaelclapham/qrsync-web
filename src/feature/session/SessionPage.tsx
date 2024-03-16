@@ -6,8 +6,8 @@ import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
 
 export interface SessionPageProps {
-    sessionId: string | null;
-    sessionOwnerId: string | null;
+    sessionId: string | undefined;
+    sessionOwnerId: string | undefined;
     clientMap: Record<string, ServerTypes.Client>;
     wsClient: WSClient;
     onLeaveSession: () => any;

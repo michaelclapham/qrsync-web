@@ -8,54 +8,59 @@ import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router';
 import { HomePage } from './feature/home/HomePage';
 import { WSClient } from './WSClient';
+import { ServerTypes } from './ServerTypes';
+import { SessionPage } from './feature/session/SessionPage';
 
 export const App: React.FC = () => {
 
   let wsUrl = "wss://qrsync.org/api/v1/ws";
   const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
+  const [ourClientId, setOurClientId] = useState<string>();
+  const [sessionOwnerId, setSessionOwnerId] = useState<string>();
+  const [sessionId, setSessionId] = useState<string>();
+  const [clientMap, setClientMap] = useState<Record<string, ServerTypes.Client>>({});
+  const [result, setResult] = useState<string>();
 
-  wsClient.addMessageHandler("main", onReceiveWebsocketMsg);
+  const onClientJoinedSessionMsg = (msg: ServerTypes.ClientJoinedSessionMsg) => {
+    if (msg.clientId === ourClientId) {
+      setSessionId(msg.sessionId);
+      setSessionOwnerId(msg.sessionOwnerId);
+      setClientMap(msg.clientMap);
+    }
+  }
+
+  const onClientConnectMsg = (msg: ServerTypes.ClientConnectMsg) => {
+    setOurClientId(msg.client.id);
+  }
 
   const onReceiveWebsocketMsg = (msg: ServerTypes.Msg) => {
     if (msg.type) {
       switch (msg.type) {
-        case "ClientConnect": return this.onClientConnectMsg(msg);
-        case "ClientJoinedSession": return this.onClientJoinedSessionMsg(msg);
-        case "BroadcastFromSession": return this.onBroadcastFromSessionMsg(msg);
+        case "ClientConnect": return onClientConnectMsg(msg);
+        case "ClientJoinedSession": return onClientJoinedSessionMsg(msg);
+        case "BroadcastFromSession": return onBroadcastFromSessionMsg(msg);
       }
     } else {
       console.warn("No message type ", msg);
     }
   }
 
-  const onClientJoinedSessionMsg = (msg: ServerTypes.ClientJoinedSessionMsg) => {
-    if (msg.clientId === this.state.ourClientId) {
-      this.setState({
-        sessionId: msg.sessionId,
-        sessionOwnerId: msg.sessionOwnerId,
-        clientMap: msg.clientMap
-      });
-    }
-  }
-
-  const onClientConnectMsg = (msg: ServerTypes.ClientConnectMsg) => {
-    this.setState({ ourClientId: msg.client.id });
-  }
+  wsClient.addMessageHandler("main", onReceiveWebsocketMsg);
 
   const onScanClient = (clientId: string | null) => {
-    this.setState({result: "" + clientId});
+    setResult("" + clientId);
     if (clientId) {
       console.log("Client id scanned ", clientId);
-      if (!this.state.sessionId) {
-        this.wsClient.sendMessage({
+      if (!sessionId) {
+        wsClient.sendMessage({
           type: "CreateSession",
           addClientId: clientId
         });
       } else {
-        this.wsClient.sendMessage({
+        wsClient.sendMessage({
           type: "AddSessionClient",
           addClientId: clientId,
-          sessionId: this.state.sessionId
+          sessionId: sessionId
         });
       }
     }
@@ -65,9 +70,9 @@ export const App: React.FC = () => {
 
   }
 
-  onLeaveSession = () => {
-    this.wsClient.leaveSession();
-    this.setState({ sessionId: null });
+  const onLeaveSession = () => {
+    wsClient.leaveSession();
+    setSessionId(undefined);
   }
 
   return (<IonApp>
@@ -78,6 +83,15 @@ export const App: React.FC = () => {
               ourClientId={wsClient.getId()}
               onScanClient={onScanClient}
             ></HomePage>
+        </Route>
+        <Route path="/session">
+          <SessionPage
+              wsClient={wsClient}
+              sessionId={sessionId}
+              clientMap={clientMap}
+              sessionOwnerId={sessionOwnerId}
+              onLeaveSession={onLeaveSession}
+            ></SessionPage> 
         </Route>
         <Redirect exact from="/" to="/home" />
       </IonRouterOutlet>
