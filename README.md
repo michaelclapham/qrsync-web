@@ -1,4 +1,5 @@
 ## QR Sync Admin Web
+
 This is the new web interface for the QR Sync Admin app.
 
 The goal of this admin app is for controlling multiple computers using a quick and easy QR scanning sync process.

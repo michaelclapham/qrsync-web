@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import QRCode from "react-qr-code";
-import { IonButton, IonContent, IonHeader, IonModal, IonPage, IonToolbar } from "@ionic/react";
+import {
+  IonButton,
+  IonContent,
+  IonHeader,
+  IonModal,
+  IonPage,
+  IonToolbar,
+} from "@ionic/react";
 import { ScanClientModal } from "../scan-client/ScanClientModal";
 import { IntroSlides } from "../intro-slides/IntroSlides";
 
@@ -31,9 +38,7 @@ export const HomePage: React.FC<HomePageProps> = ({
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <h1 style={{display: "flex", justifyContent: "center"}}>
-            QR Sync
-          </h1>
+          <h1 style={{ display: "flex", justifyContent: "center" }}>QR Sync</h1>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

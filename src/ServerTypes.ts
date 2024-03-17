@@ -32,14 +32,14 @@ export namespace ServerTypes {
         clientId: string;
         sessionId: string;
         sessionOwnerId: string;
-        clientMap: {[key: string]: Client};
+        clientMap: { [key: string]: Client };
     }
     export interface ClientLeftSessionMsg {
         type: "ClientLeftSession";
         clientId: string;
         sessionId: string;
         sessionOwnerId: string;
-        clientMap: {[key: string]: Client};
+        clientMap: { [key: string]: Client };
     }
     export interface BroadcastToSessionMsg {
         type: "BroadcastToSession";
