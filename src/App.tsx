@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import { IonApp, IonRouterOutlet } from "@ionic/react";
+import { IonApp, IonRouterOutlet, useIonRouter } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router";
 import { HomePage } from "./feature/home/HomePage";
@@ -9,7 +9,8 @@ import { ServerTypes } from "./ServerTypes";
 import { SessionPage } from "./feature/session/SessionPage";
 
 export const App: React.FC = () => {
-  let wsUrl = "wss://qrsync.org/api/v1/ws";
+  // let wsUrl = "wss://qrsync.org/api/v1/ws";
+  let wsUrl = "ws://localhost:4010/api/v1/ws";
   const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
   const [ourClientId, setOurClientId] = useState<string>();
   const [sessionOwnerId, setSessionOwnerId] = useState<string>();
@@ -59,7 +60,7 @@ export const App: React.FC = () => {
         });
       } else {
         wsClient.sendMessage({
-          type: "AddSessionClient",
+          type: "AddClientToSession",
           addClientId: clientId,
           sessionId: sessionId,
         });
@@ -80,7 +81,7 @@ export const App: React.FC = () => {
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet>
-          <Route path="/home">
+          <Route path="/">
             <HomePage
               ourClientId={wsClient.getId()}
               onScanClient={onScanClient}
@@ -95,7 +96,6 @@ export const App: React.FC = () => {
               onLeaveSession={onLeaveSession}
             ></SessionPage>
           </Route>
-          <Redirect exact from="/" to="/home" />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

@@ -69,7 +69,7 @@ export class WSClient {
             const prevSessionId = localStorage.getItem("prevSessionId");
             if (prevSessionId) {
                 this.sendMessage({
-                    type: "AddSessionClient",
+                    type: "AddClientToSession",
                     sessionId: prevSessionId,
                     addClientId: this.clientId
                 });
