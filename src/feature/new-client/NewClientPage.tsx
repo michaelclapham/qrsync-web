@@ -7,23 +7,20 @@ import {
   IonModal,
   IonPage,
   IonToolbar,
-  useIonRouter,
 } from "@ionic/react";
 import { ScanClientModal } from "../scan-client/ScanClientModal";
 import { IntroSlides } from "../intro-slides/IntroSlides";
 
-export interface HomePageProps {
+export interface NewClientPageProps {
   ourClientId: string | null;
   onScanClient: (clientId: string | null) => any;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({
+export const NewClientPage: React.FC<NewClientPageProps> = ({
   ourClientId,
   onScanClient,
 }) => {
   const [scanModalOpen, setScanModalOpen] = useState(false);
-
-  const router = useIonRouter();
 
   const closeScannerModal = () => {
     console.log("Close scanner");
@@ -34,7 +31,6 @@ export const HomePage: React.FC<HomePageProps> = ({
     if (result) {
       closeScannerModal();
       onScanClient(result);
-      router.push("session");
     }
   };
 

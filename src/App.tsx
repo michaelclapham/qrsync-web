@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { IonApp, IonRouterOutlet, useIonRouter } from "@ionic/react";
+import { IonApp, IonRouterOutlet } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { Redirect, Route } from "react-router";
-import { HomePage } from "./feature/home/HomePage";
+import { Route } from "react-router";
+import { NewClientPage } from "./feature/new-client/NewClientPage";
 import { WSClient } from "./WSClient";
 import { ServerTypes } from "./ServerTypes";
 import { SessionPage } from "./feature/session/SessionPage";
+import { useHistory } from "react-router-dom";
+
+export enum Page {
+  NEW_CLIENT,
+  SESSION,
+}
 
 export const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<Page>(Page.NEW_CLIENT);
   // let wsUrl = "wss://qrsync.org/api/v1/ws";
   let wsUrl = "ws://localhost:4010/api/v1/ws";
   const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
@@ -19,6 +26,11 @@ export const App: React.FC = () => {
     Record<string, ServerTypes.Client>
   >({});
 
+  const navigateToSessionPage = () => {
+    setCurrentPage(Page.SESSION);
+    console.log("Current page ", currentPage);
+  };
+
   const onClientJoinedSessionMsg = (
     msg: ServerTypes.ClientJoinedSessionMsg
   ) => {
@@ -26,6 +38,8 @@ export const App: React.FC = () => {
       setSessionId(msg.sessionId);
       setSessionOwnerId(msg.sessionOwnerId);
       setClientMap(msg.clientMap);
+      // Move to session screen once part of a session
+      navigateToSessionPage();
     }
   };
 
@@ -65,6 +79,8 @@ export const App: React.FC = () => {
           sessionId: sessionId,
         });
       }
+      // Move to session screen once part of a session
+      navigateToSessionPage();
     }
   };
 
@@ -75,29 +91,26 @@ export const App: React.FC = () => {
   const onLeaveSession = () => {
     wsClient.leaveSession();
     setSessionId(undefined);
+    setCurrentPage(Page.NEW_CLIENT);
   };
 
   return (
     <IonApp>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route path="/">
-            <HomePage
-              ourClientId={wsClient.getId()}
-              onScanClient={onScanClient}
-            ></HomePage>
-          </Route>
-          <Route path="/session">
-            <SessionPage
-              wsClient={wsClient}
-              sessionId={sessionId}
-              clientMap={clientMap}
-              sessionOwnerId={sessionOwnerId}
-              onLeaveSession={onLeaveSession}
-            ></SessionPage>
-          </Route>
-        </IonRouterOutlet>
-      </IonReactRouter>
+      {currentPage != Page.NEW_CLIENT ? null : (
+        <NewClientPage
+          ourClientId={wsClient.getId()}
+          onScanClient={onScanClient}
+        ></NewClientPage>
+      )}
+      {currentPage != Page.SESSION ? null : (
+        <SessionPage
+          wsClient={wsClient}
+          sessionId={sessionId}
+          clientMap={clientMap}
+          sessionOwnerId={sessionOwnerId}
+          onLeaveSession={onLeaveSession}
+        ></SessionPage>
+      )}
     </IonApp>
   );
 };
