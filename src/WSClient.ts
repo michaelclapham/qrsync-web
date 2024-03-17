@@ -4,7 +4,7 @@ export type WSMessageHandler = (msg: ServerTypes.Msg) => any;
 
 export class WSClient {
     ws: WebSocket;
-    messageHandlerMap: {[id: string]: WSMessageHandler} = {};
+    messageHandlerMap: { [id: string]: WSMessageHandler } = {};
     allMessages: ServerTypes.Msg[] = [];
     public clientId: string | null = null;
     clientName: string = "";
@@ -69,7 +69,7 @@ export class WSClient {
             const prevSessionId = localStorage.getItem("prevSessionId");
             if (prevSessionId) {
                 this.sendMessage({
-                    type: "AddSessionClient",
+                    type: "AddClientToSession",
                     sessionId: prevSessionId,
                     addClientId: this.clientId
                 });

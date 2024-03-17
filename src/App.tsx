@@ -1,115 +1,116 @@
-import React from 'react';
-import './App.css';
-import { ServerTypes } from './ServerTypes';
-import { Header } from './feature/header/Header';
-import { SessionPage } from './feature/session/SessionPage';
-import { HomePage } from './feature/home/HomePage';
-import { WSClient } from './WSClient';
-import { IonApp } from '@ionic/react';
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import { IonApp, IonRouterOutlet } from "@ionic/react";
+import { IonReactRouter } from "@ionic/react-router";
+import { Route } from "react-router";
+import { NewClientPage } from "./feature/new-client/NewClientPage";
+import { WSClient } from "./WSClient";
+import { ServerTypes } from "./ServerTypes";
+import { SessionPage } from "./feature/session/SessionPage";
+import { useHistory } from "react-router-dom";
 
-interface AppState {
-  result: string;
-  goToURL: string;
-  clientMap: {[key: string]: ServerTypes.Client};
-  scanModalOpen: boolean;
-  ourClientId: string | null;
-  sessionId: string | null;
-  sessionOwnerId: string | null;
+export enum Page {
+  NEW_CLIENT,
+  SESSION,
 }
 
-class App extends React.Component<{}, AppState> {
-  wsClient: WSClient;
+export const App: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<Page>(Page.NEW_CLIENT);
+  // let wsUrl = "wss://qrsync.org/api/v1/ws";
+  let wsUrl = "ws://localhost:4010/api/v1/ws";
+  const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
+  const [ourClientId, setOurClientId] = useState<string>();
+  const [sessionOwnerId, setSessionOwnerId] = useState<string>();
+  const [sessionId, setSessionId] = useState<string>();
+  const [clientMap, setClientMap] = useState<
+    Record<string, ServerTypes.Client>
+  >({});
 
-  constructor(props: {}) {
-    super(props);
-    this.state = {
-      result: "",
-      goToURL: "",
-      clientMap: {},
-      scanModalOpen: false,
-      ourClientId: null,
-      sessionId: null,
-      sessionOwnerId: null
-    };
-    let wsUrl = "wss://qrsync.org/api/v1/ws";
-    this.wsClient = new WSClient(wsUrl);
-    this.wsClient.addMessageHandler("main", this.onReceiveWebsocketMsg);
-  }
+  const navigateToSessionPage = () => {
+    setCurrentPage(Page.SESSION);
+    console.log("Current page ", currentPage);
+  };
 
-  onReceiveWebsocketMsg = (msg: ServerTypes.Msg) => {
+  const onClientJoinedSessionMsg = (
+    msg: ServerTypes.ClientJoinedSessionMsg
+  ) => {
+    if (msg.clientId === ourClientId) {
+      setSessionId(msg.sessionId);
+      setSessionOwnerId(msg.sessionOwnerId);
+      setClientMap(msg.clientMap);
+      // Move to session screen once part of a session
+      navigateToSessionPage();
+    }
+  };
+
+  const onClientConnectMsg = (msg: ServerTypes.ClientConnectMsg) => {
+    setOurClientId(msg.client.id);
+  };
+
+  const onReceiveWebsocketMsg = (msg: ServerTypes.Msg) => {
     if (msg.type) {
       switch (msg.type) {
-        case "ClientConnect": return this.onClientConnectMsg(msg);
-        case "ClientJoinedSession": return this.onClientJoinedSessionMsg(msg);
-        case "BroadcastFromSession": return this.onBroadcastFromSessionMsg(msg);
+        case "ClientConnect":
+          return onClientConnectMsg(msg);
+        case "ClientJoinedSession":
+          return onClientJoinedSessionMsg(msg);
+        case "BroadcastFromSession":
+          return onBroadcastFromSessionMsg(msg);
       }
     } else {
       console.warn("No message type ", msg);
     }
-  }
+  };
 
-  onClientJoinedSessionMsg = (msg: ServerTypes.ClientJoinedSessionMsg) => {
-    if (msg.clientId === this.state.ourClientId) {
-      this.setState({
-        sessionId: msg.sessionId,
-        sessionOwnerId: msg.sessionOwnerId,
-        clientMap: msg.clientMap
-      });
-    }
-  }
+  wsClient.addMessageHandler("main", onReceiveWebsocketMsg);
 
-  onClientConnectMsg = (msg: ServerTypes.ClientConnectMsg) => {
-    this.setState({ ourClientId: msg.client.id });
-  }
-
-  onScanClient = (clientId: string | null) => {
-    this.setState({result: "" + clientId});
+  const onScanClient = (clientId: string | null) => {
     if (clientId) {
       console.log("Client id scanned ", clientId);
-      if (!this.state.sessionId) {
-        this.wsClient.sendMessage({
+      if (!sessionId) {
+        wsClient.sendMessage({
           type: "CreateSession",
-          addClientId: clientId
+          addClientId: clientId,
         });
       } else {
-        this.wsClient.sendMessage({
-          type: "AddSessionClient",
+        wsClient.sendMessage({
+          type: "AddClientToSession",
           addClientId: clientId,
-          sessionId: this.state.sessionId
+          sessionId: sessionId,
         });
       }
+      // Move to session screen once part of a session
+      navigateToSessionPage();
     }
-  }
+  };
 
-  onBroadcastFromSessionMsg = (msg: ServerTypes.BroadcastFromSessionMsg) => {
+  const onBroadcastFromSessionMsg = (
+    msg: ServerTypes.BroadcastFromSessionMsg
+  ) => {};
 
-  }
+  const onLeaveSession = () => {
+    wsClient.leaveSession();
+    setSessionId(undefined);
+    setCurrentPage(Page.NEW_CLIENT);
+  };
 
-  onLeaveSession = () => {
-    this.wsClient.leaveSession();
-    this.setState({ sessionId: null });
-  }
-
-  render() {
-    return <div className="App">
-      <IonApp>
-        <Header></Header>
-        {this.state.sessionId ? 
-          <SessionPage
-            wsClient={this.wsClient}
-            sessionId={this.state.sessionId}
-            clientMap={this.state.clientMap}
-            sessionOwnerId={this.state.sessionOwnerId}
-            onLeaveSession={this.onLeaveSession}
-          ></SessionPage> :
-          <HomePage
-            ourClientId={this.wsClient.getId()}
-            onScanClient={this.onScanClient}
-          ></HomePage>
-        }
-      </IonApp>
-    </div>
-  }
-}
-
-export default App;
+  return (
+    <IonApp>
+      {currentPage != Page.NEW_CLIENT ? null : (
+        <NewClientPage
+          ourClientId={wsClient.getId()}
+          onScanClient={onScanClient}
+        ></NewClientPage>
+      )}
+      {currentPage != Page.SESSION ? null : (
+        <SessionPage
+          wsClient={wsClient}
+          sessionId={sessionId}
+          clientMap={clientMap}
+          sessionOwnerId={sessionOwnerId}
+          onLeaveSession={onLeaveSession}
+        ></SessionPage>
+      )}
+    </IonApp>
+  );
+};
