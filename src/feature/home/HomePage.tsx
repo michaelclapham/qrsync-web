@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import QRCode from "react-qr-code";
-import { IonButton, IonContent, IonHeader, IonModal, IonPage, IonTitle, IonToolbar } from "@ionic/react";
+import { IonButton, IonContent, IonHeader, IonModal, IonPage, IonToolbar } from "@ionic/react";
 import { ScanClientModal } from "../scan-client/ScanClientModal";
 import { IntroSlides } from "../intro-slides/IntroSlides";
 

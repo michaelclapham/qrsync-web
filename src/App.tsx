@@ -19,7 +19,6 @@ export const App: React.FC = () => {
   const [sessionOwnerId, setSessionOwnerId] = useState<string>();
   const [sessionId, setSessionId] = useState<string>();
   const [clientMap, setClientMap] = useState<Record<string, ServerTypes.Client>>({});
-  const [result, setResult] = useState<string>();
 
   const onClientJoinedSessionMsg = (msg: ServerTypes.ClientJoinedSessionMsg) => {
     if (msg.clientId === ourClientId) {
@@ -48,7 +47,6 @@ export const App: React.FC = () => {
   wsClient.addMessageHandler("main", onReceiveWebsocketMsg);
 
   const onScanClient = (clientId: string | null) => {
-    setResult("" + clientId);
     if (clientId) {
       console.log("Client id scanned ", clientId);
       if (!sessionId) {
