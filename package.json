@@ -9,7 +9,10 @@
     "react-dom": "^18.2.0",
     "react-qr-code": "^2.0.12",
     "react-responsive-carousel": "^3.2.23",
-    "typescript": "^4"
+    "typescript": "^4.9.5",
+    "@ionic/react-router": "7.8.0",
+    "react-router": "^5.3.4",
+    "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
@@ -17,6 +20,7 @@
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
     "@types/react-qr-reader": "^2.1.7",
+    "@types/react-router-dom": "^5.3.3",
     "eslint-utils": "^3.0.0",
     "react-scripts": "^5.0.1",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
