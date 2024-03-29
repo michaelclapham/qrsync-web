@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { IonApp, IonPage, IonRouterOutlet, useIonRouter } from "@ionic/react";
+import { IonApp, IonPage, IonRouterOutlet } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router";
 import { HomePage } from "./feature/home/HomePage";
@@ -10,8 +10,8 @@ import { SessionPage } from "./feature/session/SessionPage";
 import { NavigateOnStateChange } from "./NavigateOnStateChange";
 
 export const App: React.FC = () => {
-  // let wsUrl = "wss://qrsync.org/api/v1/ws";
-  let wsUrl = "ws://localhost:4010/api/v1/ws";
+  let wsUrl = "wss://qrsync.org/api/v1/ws";
+  // let wsUrl = "ws://localhost:4010/api/v1/ws";
   const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
   const [ourClientId, setOurClientId] = useState<string>();
   const [sessionOwnerId, setSessionOwnerId] = useState<string>();
@@ -22,13 +22,6 @@ export const App: React.FC = () => {
   // State used to navigate to route via a server sent event (not user link click)
   const [changeToRoute, setChangeToRoute] = useState<string | undefined>();
 
-  useEffect(() => {
-    setTimeout(() => {
-      console.log("attempt to change to /test");
-      setChangeToRoute("test");
-    }, 5000);
-  }, []);
-
   const onClientJoinedSessionMsg = (
     msg: ServerTypes.ClientJoinedSessionMsg
   ) => {
@@ -36,6 +29,7 @@ export const App: React.FC = () => {
       setSessionId(msg.sessionId);
       setSessionOwnerId(msg.sessionOwnerId);
       setClientMap(msg.clientMap);
+      setChangeToRoute("/session");
     }
   };
 
@@ -85,6 +79,7 @@ export const App: React.FC = () => {
   const onLeaveSession = () => {
     wsClient.leaveSession();
     setSessionId(undefined);
+    setChangeToRoute("/index.html");
   };
 
   return (
