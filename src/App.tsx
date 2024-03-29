@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { IonApp, IonRouterOutlet, useIonRouter } from "@ionic/react";
+import { IonApp, IonPage, IonRouterOutlet, useIonRouter } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Redirect, Route } from "react-router";
 import { HomePage } from "./feature/home/HomePage";
 import { WSClient } from "./WSClient";
 import { ServerTypes } from "./ServerTypes";
 import { SessionPage } from "./feature/session/SessionPage";
+import { NavigateOnStateChange } from "./NavigateOnStateChange";
 
 export const App: React.FC = () => {
   // let wsUrl = "wss://qrsync.org/api/v1/ws";
@@ -18,6 +19,15 @@ export const App: React.FC = () => {
   const [clientMap, setClientMap] = useState<
     Record<string, ServerTypes.Client>
   >({});
+  // State used to navigate to route via a server sent event (not user link click)
+  const [changeToRoute, setChangeToRoute] = useState<string | undefined>();
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.log("attempt to change to /test");
+      setChangeToRoute("test");
+    }, 5000);
+  }, []);
 
   const onClientJoinedSessionMsg = (
     msg: ServerTypes.ClientJoinedSessionMsg
@@ -80,8 +90,13 @@ export const App: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
+        {/*
+          Way to change react router route based on websocket events without
+          having to create second state wrapper inside of IonReactRouter
+        */}
+        <NavigateOnStateChange route={changeToRoute} onNavigate={() => setChangeToRoute(undefined)}/>
         <IonRouterOutlet>
-          <Route path="/">
+          <Route path="/index.html">
             <HomePage
               ourClientId={wsClient.getId()}
               onScanClient={onScanClient}
@@ -96,6 +111,12 @@ export const App: React.FC = () => {
               onLeaveSession={onLeaveSession}
             ></SessionPage>
           </Route>
+          <Route path="/test">
+            <IonPage>
+              <h1>Just a quick test...</h1>
+            </IonPage>
+          </Route>
+          <Redirect exact from="/" to="/index.html" />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
