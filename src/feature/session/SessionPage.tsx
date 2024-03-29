@@ -1,6 +1,6 @@
 import React from "react";
 import { ServerTypes } from "../../ServerTypes";
-import { IonButton, IonPage } from "@ionic/react";
+import { IonButton, IonPage, IonToolbar } from "@ionic/react";
 import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
@@ -35,6 +35,9 @@ export class SessionPage extends React.Component<
   render() {
     return (
       <IonPage>
+        <IonToolbar>
+          Session
+        </IonToolbar>
         <IonButton onClick={this.props.onLeaveSession}>Leave Session</IonButton>
         <h1>Session Page</h1>
         <p>{this.props.sessionId}</p>

@@ -68,7 +68,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             </IonButton>
           </div>
           <IntroSlides
-            style={{ height: "50%", maxWidth: "600px" }}
+            style={{ maxWidth: "600px" }}
           ></IntroSlides>
           <IonModal isOpen={scanModalOpen} onDidDismiss={closeScannerModal}>
             <ScanClientModal

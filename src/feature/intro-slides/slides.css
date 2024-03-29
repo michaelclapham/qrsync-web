@@ -1,5 +1,8 @@
 .introSlider {
   margin-bottom: 20px;
+  background-color: #222222;
+  border-radius: 16px;
+  color: white;
 }
 
 .slideDescription {
