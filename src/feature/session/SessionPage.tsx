@@ -1,6 +1,18 @@
 import React from "react";
 import { ServerTypes } from "../../ServerTypes";
-import { IonButton, IonPage, IonToolbar } from "@ionic/react";
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
 import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
@@ -35,25 +47,47 @@ export class SessionPage extends React.Component<
   render() {
     return (
       <IonPage>
-        <IonToolbar>
-          Session
-        </IonToolbar>
-        <IonButton onClick={this.props.onLeaveSession}>Leave Session</IonButton>
-        <h1>Session Page</h1>
-        <p>{this.props.sessionId}</p>
-        <h2>Session Messages</h2>
-        <ul>
-          {this.state.sessionMessages.map((sessionMsg) => (
-            <li>{sessionMsg.text}</li>
-          ))}
-        </ul>
-        <h2>Session Actions:</h2>
-        <SessionActionsList
-          wsClient={this.props.wsClient}
-          userIsSessionOwner={
-            this.props.sessionOwnerId === this.props.wsClient.getId()
-          }
-        ></SessionActionsList>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle>QR Sync - Session</IonTitle>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent>
+          <IonCard>
+            <IonCardHeader>
+              <IonCardTitle>Clients</IonCardTitle>
+              <IonCardSubtitle>Devices connected to this session</IonCardSubtitle>
+            </IonCardHeader>
+            <IonCardContent>
+              <p>You are the only client connected to this session.</p>
+              <IonButton>Add Client</IonButton>
+            </IonCardContent>
+          </IonCard>
+          <IonCard>
+            <IonCardHeader>
+              <IonCardTitle>History</IonCardTitle>
+            </IonCardHeader>
+            <IonCardContent>
+              <p>Shared content will show up here .</p>
+            </IonCardContent>
+          </IonCard>
+          <IonCard>
+            <IonCardHeader>
+              <IonCardTitle>Share</IonCardTitle>
+            </IonCardHeader>
+            <IonCardContent>
+                <SessionActionsList
+                wsClient={this.props.wsClient}
+                userIsSessionOwner={
+                  this.props.sessionOwnerId === this.props.wsClient.getId()
+                }
+              ></SessionActionsList>
+            </IonCardContent>
+          </IonCard>
+          <IonButton onClick={this.props.onLeaveSession}>
+            Leave Session
+          </IonButton>
+        </IonContent>
       </IonPage>
     );
   }
