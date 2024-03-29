@@ -1,5 +1,5 @@
 import { useIonRouter } from "@ionic/react";
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 
 type NavigateOnStateChangeProps = { route?: string, onNavigate?: () => void}
 
@@ -7,7 +7,7 @@ export const NavigateOnStateChange: React.FC<NavigateOnStateChangeProps> = ({rou
     const ionRouter = useIonRouter();
     console.log("NavigateOnStateChange", ionRouter);
     useEffect(() => {
-      if (route) {
+      if (route && ionRouter) {
         console.log("Route changed ", route);
         setTimeout(() => {
             ionRouter.push(route);
@@ -16,6 +16,8 @@ export const NavigateOnStateChange: React.FC<NavigateOnStateChangeProps> = ({rou
             onNavigate();
         }
       }
+    /* This useEffect should ONLY run when route changes */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [route]);
     return <></>
   }
