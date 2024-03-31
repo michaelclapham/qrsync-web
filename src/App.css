@@ -1,8 +1,5 @@
 body {
   --ion-color-primary: #107c76;
-  --ion-background-color: rgb(39, 39, 39);
-  --ion-text-color: white;
-  --ion-text-color-rgb: 255, 255, 255;
 }
 
 .modal-wrapper {
@@ -12,8 +9,6 @@ body {
 .App {
   text-align: center;
   height: 100vh;
-  background-color: #282c34;
-  color: white;
 }
 
 .app-title-container {
@@ -65,8 +60,6 @@ body {
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
-  border-bottom: 1px solid white;
 }
 
 .App-link {
