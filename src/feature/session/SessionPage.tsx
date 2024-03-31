@@ -1,12 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ServerTypes } from "../../ServerTypes";
 import {
   IonButton,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonContent,
   IonHeader,
   IonPage,
@@ -15,7 +10,6 @@ import {
 } from "@ionic/react";
 import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
-import { SessionActionsList } from "../session-actions/SessionActionsList";
 import { ClientsCard } from "../clients/ClientsCard";
 import { HistoryCard } from "../history/HistoryCard";
 import { ShareCard } from "../share/ShareCard";
@@ -28,68 +22,31 @@ export interface SessionPageProps {
   onLeaveSession: () => any;
 }
 
-export interface SessionPageState {
-  urlInput: string;
-  sessionMessages: SessionMessage[];
-}
+export const SessionPage: React.FC<SessionPageProps> = ({
+  sessionId,
+  sessionOwnerId,
+  clientMap,
+  wsClient,
+  onLeaveSession,
+}) => {
+  const [sessionMessages, setSessionMessages] = useState<SessionMessage[]>([]);
 
-export class SessionPage extends React.Component<
-  SessionPageProps,
-  SessionPageState
-> {
-  state = {
-    urlInput: "",
-    sessionMessages: [],
-  } as SessionPageState;
+  useEffect(() => {
+    wsClient.addMessageHandler('session_page', onWebsocketMessage);
+  }, [wsClient]);
 
-  constructor(props: SessionPageProps) {
-    super(props);
-    props.wsClient.addMessageHandler("session_page", this.onWebsocketMessage);
-  }
-
-  render() {
-    return (
-      <IonPage>
-        <IonHeader>
-          <IonToolbar>
-            <IonTitle>QR Sync - Session</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonContent>
-          <ClientsCard
-            clientMap={this.props.clientMap}
-            ownerId={this.props.sessionOwnerId}
-            addClientClicked={() => {
-              // TODO: Implement opening add client modal from session page
-              console.log("add client from clients card to be implemented")
-            }}
-          ></ClientsCard>
-          {/* TODO: Show received messages / content in history card */}
-          <HistoryCard></HistoryCard>
-          <ShareCard
-            wsClient={this.props.wsClient}
-            sessionOwnerId={this.props.sessionOwnerId}
-          ></ShareCard>
-          <IonButton onClick={this.props.onLeaveSession}>
-            Leave Session
-          </IonButton>
-        </IonContent>
-      </IonPage>
-    );
-  }
-
-  onWebsocketMessage = (msg: ServerTypes.Msg) => {
+  const onWebsocketMessage = (msg: ServerTypes.Msg) => {
     if (msg.type === "BroadcastFromSession") {
       let payload: SessionMessage = msg.payload;
       if (payload.type && payload.text) {
         let sessionMsgs: SessionMessage[] = [];
-        if (this.state.sessionMessages) {
-          sessionMsgs = this.state.sessionMessages;
+        if (sessionMessages) {
+          sessionMsgs = sessionMessages;
         }
         sessionMsgs.push(payload);
-        this.setState({ sessionMessages: sessionMsgs });
+        setSessionMessages(sessionMsgs);
       }
-      if (msg.senderId !== this.props.wsClient.getId()) {
+      if (msg.senderId !== wsClient.getId()) {
         if (payload.type === "OPEN_WEBSITE") {
           console.log("Opening url ", payload.text);
           window.open(payload.text, "_blank");
@@ -97,4 +54,27 @@ export class SessionPage extends React.Component<
       }
     }
   };
-}
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar>
+          <IonTitle>QR Sync - Session</IonTitle>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent>
+        <ClientsCard
+          clientMap={clientMap}
+          ownerId={sessionOwnerId}
+          addClientClicked={() => {
+            /* TODO: Implement opening add client modal */
+          }}
+        />
+        {/* TODO: Show received messages in history card */}
+        <HistoryCard></HistoryCard>
+        <ShareCard wsClient={wsClient} sessionOwnerId={sessionOwnerId} />
+        <IonButton onClick={onLeaveSession}>Leave Session with id: {sessionId}</IonButton>
+      </IonContent>
+    </IonPage>
+  );
+};
