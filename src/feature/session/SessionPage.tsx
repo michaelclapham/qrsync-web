@@ -18,6 +18,7 @@ import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
 import { ClientsCard } from "../clients/ClientsCard";
 import { HistoryCard } from "../history/HistoryCard";
+import { ShareCard } from "../share/ShareCard";
 
 export interface SessionPageProps {
   sessionId: string | undefined;
@@ -65,19 +66,10 @@ export class SessionPage extends React.Component<
           ></ClientsCard>
           {/* TODO: Show received messages / content in history card */}
           <HistoryCard></HistoryCard>
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>Share</IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent>
-                <SessionActionsList
-                wsClient={this.props.wsClient}
-                userIsSessionOwner={
-                  this.props.sessionOwnerId === this.props.wsClient.getId()
-                }
-              ></SessionActionsList>
-            </IonCardContent>
-          </IonCard>
+          <ShareCard
+            wsClient={this.props.wsClient}
+            sessionOwnerId={this.props.sessionOwnerId}
+          ></ShareCard>
           <IonButton onClick={this.props.onLeaveSession}>
             Leave Session
           </IonButton>
