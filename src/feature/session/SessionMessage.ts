@@ -4,9 +4,10 @@ export const sessionMessageTypes = ["TEXT_MESSAGE", "FILE", "OPEN_WEBSITE"] as c
 export type SessionMessageType = typeof sessionMessageTypes[number];
 
 export interface SessionMessage {
+    uuid?: string;
     type?: SessionMessageType;
-    senderId: string;
-    senderName: string;
+    senderId?: string;
+    senderName?: string;
     text?: string;
 }
 
@@ -20,6 +21,7 @@ export function mapSessionMsg(serverMsg: ServerTypes.BroadcastFromSessionMsg): S
         sessionMsgType = undefined;
     }
     return {
+        uuid: ("" + Math.random() + "-" + Math.random()).replace(".", "0"),
         type: sessionMsgType,
         senderId: serverMsg.senderId,
         senderName: serverMsg.payload["senderName"] ?? "",

@@ -89,6 +89,19 @@ export const App: React.FC = () => {
     setChangeToRoute("/index.html");
   };
 
+  const onShare = (msg: SessionMessage) => {
+    let msgWithSender: SessionMessage = {
+      ...msg,
+      senderId: wsClient.getId() ?? "",
+      senderName: wsClient.getName(),
+    }
+    let serverMsg: ServerTypes.BroadcastToSessionMsg = {
+      type: "BroadcastToSession",
+      payload: msgWithSender
+    };
+    wsClient.sendMessage(serverMsg);
+  }
+
   return (
     <IonApp>
       <IonReactRouter>
@@ -107,10 +120,11 @@ export const App: React.FC = () => {
           <Route path="/session">
             <SessionPage
               sessionMessages={sessionMessages}
-              wsClient={wsClient}
+              userIsSessionOwner={wsClient.getId() === sessionOwnerId}
               sessionId={sessionId}
               clientMap={clientMap}
               sessionOwnerId={sessionOwnerId}
+              onShare={onShare}
               onLeaveSession={onLeaveSession}
             ></SessionPage>
           </Route>

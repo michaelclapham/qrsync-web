@@ -13,7 +13,7 @@ export const HistoryCard: React.FC<HistoryCardProps> = ({messages}) => {
     </IonCardHeader>
     <IonCardContent>
         { messages.length === 0 ? <NoMessages/> :
-        messages.map(msg => <Message msg={msg} />) }
+        messages.map(msg => <Message key={msg.uuid ?? "" + Math.random()} msg={msg} />) }
     </IonCardContent>
   </IonCard>;
 };
@@ -24,7 +24,7 @@ type MessageProps = {
 
 const Message: React.FC<MessageProps> = ({msg}) => {
     return <IonItem>
-        <b>{msg.senderName}: </b>
+        <b>{msg.senderName}:</b>
         {msg.text}
     </IonItem>
 }

@@ -8,7 +8,6 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { WSClient } from "../../WSClient";
 import { ClientsCard } from "../clients/ClientsCard";
 import { HistoryCard } from "../history/HistoryCard";
 import { ShareCard } from "../share/ShareCard";
@@ -19,7 +18,8 @@ export interface SessionPageProps {
   sessionId: string | undefined;
   sessionOwnerId: string | undefined;
   clientMap: Record<string, ServerTypes.Client>;
-  wsClient: WSClient;
+  userIsSessionOwner: boolean;
+  onShare: (msg: SessionMessage) => void;
   onLeaveSession: () => any;
 }
 
@@ -28,7 +28,8 @@ export const SessionPage: React.FC<SessionPageProps> = ({
   sessionId,
   sessionOwnerId,
   clientMap,
-  wsClient,
+  userIsSessionOwner,
+  onShare,
   onLeaveSession,
 }) => {
   return (
@@ -49,7 +50,7 @@ export const SessionPage: React.FC<SessionPageProps> = ({
         <HistoryCard
           messages={sessionMessages}
         ></HistoryCard>
-        <ShareCard wsClient={wsClient} sessionOwnerId={sessionOwnerId} />
+        <ShareCard onShare={onShare} userIsSessionOwner={userIsSessionOwner}/>
         <IonButton onClick={onLeaveSession}>Leave Session with id: {sessionId}</IonButton>
       </IonContent>
     </IonPage>
