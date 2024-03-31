@@ -17,6 +17,7 @@ import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
 import { ClientsCard } from "../clients/ClientsCard";
+import { HistoryCard } from "../history/HistoryCard";
 
 export interface SessionPageProps {
   sessionId: string | undefined;
@@ -57,16 +58,13 @@ export class SessionPage extends React.Component<
           <ClientsCard
             clientMap={this.props.clientMap}
             ownerId={this.props.sessionOwnerId}
-            addClientClicked={() => console.log("add client from clients card to be implemented")}
+            addClientClicked={() => {
+              // TODO: Implement opening add client modal from session page
+              console.log("add client from clients card to be implemented")
+            }}
           ></ClientsCard>
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>History</IonCardTitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <p>Shared content will show up here .</p>
-            </IonCardContent>
-          </IonCard>
+          {/* TODO: Show received messages / content in history card */}
+          <HistoryCard></HistoryCard>
           <IonCard>
             <IonCardHeader>
               <IonCardTitle>Share</IonCardTitle>
