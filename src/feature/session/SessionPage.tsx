@@ -16,6 +16,7 @@ import {
 import { WSClient } from "../../WSClient";
 import { SessionMessage } from "./SessionMessage";
 import { SessionActionsList } from "../session-actions/SessionActionsList";
+import { ClientsCard } from "../clients/ClientsCard";
 
 export interface SessionPageProps {
   sessionId: string | undefined;
@@ -53,16 +54,11 @@ export class SessionPage extends React.Component<
           </IonToolbar>
         </IonHeader>
         <IonContent>
-          <IonCard>
-            <IonCardHeader>
-              <IonCardTitle>Clients</IonCardTitle>
-              <IonCardSubtitle>Devices connected to this session</IonCardSubtitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <p>You are the only client connected to this session.</p>
-              <IonButton>Add Client</IonButton>
-            </IonCardContent>
-          </IonCard>
+          <ClientsCard
+            clientMap={this.props.clientMap}
+            ownerId={this.props.sessionOwnerId}
+            addClientClicked={() => console.log("add client from clients card to be implemented")}
+          ></ClientsCard>
           <IonCard>
             <IonCardHeader>
               <IonCardTitle>History</IonCardTitle>
