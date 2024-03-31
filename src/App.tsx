@@ -8,6 +8,7 @@ import { WSClient } from "./WSClient";
 import { ServerTypes } from "./ServerTypes";
 import { SessionPage } from "./feature/session/SessionPage";
 import { NavigateOnStateChange } from "./NavigateOnStateChange";
+import { SessionMessage, mapSessionMsg } from "./feature/session/SessionMessage";
 
 export const App: React.FC = () => {
   let wsUrl = "wss://qrsync.org/api/v1/ws";
@@ -19,6 +20,8 @@ export const App: React.FC = () => {
   const [clientMap, setClientMap] = useState<
     Record<string, ServerTypes.Client>
   >({});
+  const [sessionMessages, setSessionMessages] = useState<SessionMessage[]>([]);
+
   // State used to navigate to route via a server sent event (not user link click)
   const [changeToRoute, setChangeToRoute] = useState<string | undefined>();
 
@@ -73,8 +76,12 @@ export const App: React.FC = () => {
   };
 
   const onBroadcastFromSessionMsg = (
-    msg: ServerTypes.BroadcastFromSessionMsg
-  ) => {};
+    serverMsg: ServerTypes.BroadcastFromSessionMsg
+  ) => {
+    const newMsg = mapSessionMsg(serverMsg);
+    const newMsgs = sessionMessages.concat([newMsg]);
+    setSessionMessages(newMsgs);
+  };
 
   const onLeaveSession = () => {
     wsClient.leaveSession();
@@ -99,6 +106,7 @@ export const App: React.FC = () => {
           </Route>
           <Route path="/session">
             <SessionPage
+              sessionMessages={sessionMessages}
               wsClient={wsClient}
               sessionId={sessionId}
               clientMap={clientMap}
