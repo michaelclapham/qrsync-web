@@ -1,9 +1,12 @@
 export namespace ServerTypes {
     export type Msg = ClientConnectMsg | CreateSessionMsg | UpdateClientMsg | AddClientToSessionMsg | ClientJoinedSessionMsg | ClientLeftSessionMsg | BroadcastToSessionMsg | BroadcastFromSessionMsg | ErrorMsg | InfoMsg
 
+    export type Time = string; // Go times are serialised to strings
+
     export interface Client {
         id: string;
         name: string;
+        lastJoinTime: Time;
     }
     export interface Session {
         id: string;
@@ -16,7 +19,6 @@ export namespace ServerTypes {
     }
     export interface CreateSessionMsg {
         type: "CreateSession";
-        addClientId: string;
     }
     export interface UpdateClientMsg {
         type: "UpdateClient";
@@ -32,24 +34,24 @@ export namespace ServerTypes {
         clientId: string;
         sessionId: string;
         sessionOwnerId: string;
-        clientMap: { [key: string]: Client };
+        clientMap: {[key: string]: Client};
     }
     export interface ClientLeftSessionMsg {
         type: "ClientLeftSession";
         clientId: string;
         sessionId: string;
         sessionOwnerId: string;
-        clientMap: { [key: string]: Client };
+        clientMap: {[key: string]: Client};
     }
     export interface BroadcastToSessionMsg {
         type: "BroadcastToSession";
-        payload: any;
+        payload: string;
     }
     export interface BroadcastFromSessionMsg {
         type: "BroadcastFromSession";
         fromSessionOwner: boolean;
         senderId: string;
-        payload: any;
+        payload: string;
     }
     export interface ErrorMsg {
         type: "Error";
