@@ -8,6 +8,7 @@ export class WSClient {
     allMessages: ServerTypes.Msg[] = [];
     public clientId: string | null = null;
     clientName: string = "";
+    disconnectHandler: () => void = () => {};
 
     constructor(private url: string) {
         console.log("WSClient being created");
@@ -30,6 +31,10 @@ export class WSClient {
 
     public addMessageHandler(id: string, handler: WSMessageHandler) {
         this.messageHandlerMap[id] = handler;
+    }
+
+    public addDisconnectHandler(callback: () => void) { 
+        this.disconnectHandler = callback;
     }
 
     public sendMessage(msg: ServerTypes.Msg) {
@@ -58,6 +63,7 @@ export class WSClient {
         this.ws.close();
         localStorage.removeItem("prevSessionId");
         localStorage.removeItem("prevClientId");
+        this.disconnectHandler();
         this.connect(this.url);
     }
 
