@@ -11,8 +11,8 @@ import { NavigateOnStateChange } from "./NavigateOnStateChange";
 import { SessionMessage, mapSessionMsg } from "./feature/session/SessionMessage";
 
 export const App: React.FC = () => {
-  let wsUrl = "wss://qrsync.org/api/v1/ws";
-  // let wsUrl = "ws://localhost:4010/api/v1/ws";
+  // let wsUrl = "wss://qrsync.org/api/v1/ws";
+  let wsUrl = "ws://localhost:4010/api/v1/ws";
   const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
   const [ourClientId, setOurClientId] = useState<string>();
   const [sessionOwnerId, setSessionOwnerId] = useState<string>();
@@ -20,6 +20,7 @@ export const App: React.FC = () => {
   const [clientMap, setClientMap] = useState<
     Record<string, ServerTypes.Client>
   >({});
+  let clientToAddOnSessionCreation: string | undefined;
   const [sessionMessages, setSessionMessages] = useState<SessionMessage[]>([]);
 
   // State used to navigate to route via a server sent event (not user link click)
@@ -33,6 +34,13 @@ export const App: React.FC = () => {
       setSessionOwnerId(msg.sessionOwnerId);
       setClientMap(msg.clientMap);
       setChangeToRoute("/session");
+      if (clientToAddOnSessionCreation) {
+        wsClient.sendMessage({
+          type: "AddClientToSession",
+          sessionId: msg.sessionId,
+          addClientId: clientToAddOnSessionCreation
+        });
+      }
     }
   };
 
@@ -63,8 +71,8 @@ export const App: React.FC = () => {
       if (!sessionId) {
         wsClient.sendMessage({
           type: "CreateSession",
-          addClientId: clientId,
         });
+        clientToAddOnSessionCreation = clientId;
       } else {
         wsClient.sendMessage({
           type: "AddClientToSession",
@@ -97,7 +105,7 @@ export const App: React.FC = () => {
     }
     let serverMsg: ServerTypes.BroadcastToSessionMsg = {
       type: "BroadcastToSession",
-      payload: msgWithSender
+      payload: JSON.stringify(msgWithSender)
     };
     wsClient.sendMessage(serverMsg);
   }

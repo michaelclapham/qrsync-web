@@ -16,7 +16,8 @@ export interface OpenWebsiteSessionMessage extends SessionMessage {
 }
 
 export function mapSessionMsg(serverMsg: ServerTypes.BroadcastFromSessionMsg): SessionMessage {
-    let sessionMsgType = serverMsg.payload["type"] as SessionMessageType | undefined;
+    const payload = JSON.parse(serverMsg.payload);
+    let sessionMsgType = payload["type"] as SessionMessageType | undefined;
     if (sessionMessageTypes.indexOf(sessionMsgType as SessionMessageType) < 0) {
         sessionMsgType = undefined;
     }
@@ -24,7 +25,7 @@ export function mapSessionMsg(serverMsg: ServerTypes.BroadcastFromSessionMsg): S
         uuid: ("" + Math.random() + "-" + Math.random()).replace(".", "0"),
         type: sessionMsgType,
         senderId: serverMsg.senderId,
-        senderName: serverMsg.payload["senderName"] ?? "",
-        text: serverMsg.payload["text"] ?? ""
+        senderName: payload["senderName"] ?? "",
+        text: payload["text"] ?? ""
     };
 }
