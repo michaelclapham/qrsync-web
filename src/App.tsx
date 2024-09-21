@@ -10,10 +10,11 @@ import { SessionPage } from "./feature/session/SessionPage";
 import { NavigateOnStateChange } from "./NavigateOnStateChange";
 import { SessionMessage, mapSessionMsg } from "./feature/session/SessionMessage";
 
+// let wsUrl = "wss://qrsync.org/api/v1/ws";
+let wsUrl = "ws://localhost:4010/api/v1/ws";
+const wsClient = new WSClient(wsUrl);
+
 export const App: React.FC = () => {
-  // let wsUrl = "wss://qrsync.org/api/v1/ws";
-  let wsUrl = "ws://localhost:4010/api/v1/ws";
-  const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
   const [ourClientId, setOurClientId] = useState<string>();
   const [sessionOwnerId, setSessionOwnerId] = useState<string>();
   const [sessionId, setSessionId] = useState<string>();

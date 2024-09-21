@@ -10,6 +10,7 @@ export class WSClient {
     clientName: string = "";
 
     constructor(private url: string) {
+        console.log("WSClient being created");
         this.ws = this.connect(url);
     }
 
