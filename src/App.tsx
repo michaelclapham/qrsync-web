@@ -10,10 +10,26 @@ import { SessionPage } from "./feature/session/SessionPage";
 import { NavigateOnStateChange } from "./NavigateOnStateChange";
 import { SessionMessage, mapSessionMsg } from "./feature/session/SessionMessage";
 
+// let wsUrl = "wss://qrsync.org/api/v1/ws";
+let wsUrl = "ws://localhost:4010/api/v1/ws";
+const wsClient = new WSClient(wsUrl);
+
+const SESSION_MESSAGES_KEY = "sessionMessages";
+
+function getSessionStorageJSONArray(key: string, defValue: any[]): any[] {
+  const item = sessionStorage.getItem(key);
+  try {
+    if (item != null) {
+      return JSON.parse(item)
+    } else {
+      return defValue;
+    }
+  } catch (ex) {
+    return defValue;
+  }
+}
+
 export const App: React.FC = () => {
-  // let wsUrl = "wss://qrsync.org/api/v1/ws";
-  let wsUrl = "ws://localhost:4010/api/v1/ws";
-  const [wsClient] = useState<WSClient>(new WSClient(wsUrl));
   const [ourClientId, setOurClientId] = useState<string>();
   const [sessionOwnerId, setSessionOwnerId] = useState<string>();
   const [sessionId, setSessionId] = useState<string>();
@@ -21,7 +37,8 @@ export const App: React.FC = () => {
     Record<string, ServerTypes.Client>
   >({});
   let clientToAddOnSessionCreation: string | undefined;
-  const [sessionMessages, setSessionMessages] = useState<SessionMessage[]>([]);
+  const prevSavedSessionMessages = getSessionStorageJSONArray(SESSION_MESSAGES_KEY, []);
+  const [sessionMessages, setSessionMessages] = useState<SessionMessage[]>(prevSavedSessionMessages);
 
   // State used to navigate to route via a server sent event (not user link click)
   const [changeToRoute, setChangeToRoute] = useState<string | undefined>();
@@ -29,18 +46,16 @@ export const App: React.FC = () => {
   const onClientJoinedSessionMsg = (
     msg: ServerTypes.ClientJoinedSessionMsg
   ) => {
-    if (msg.clientId === ourClientId) {
-      setSessionId(msg.sessionId);
-      setSessionOwnerId(msg.sessionOwnerId);
-      setClientMap(msg.clientMap);
-      setChangeToRoute("/session");
-      if (clientToAddOnSessionCreation) {
-        wsClient.sendMessage({
-          type: "AddClientToSession",
-          sessionId: msg.sessionId,
-          addClientId: clientToAddOnSessionCreation
-        });
-      }
+    setSessionId(msg.sessionId);
+    setSessionOwnerId(msg.sessionOwnerId);
+    setClientMap(msg.clientMap);
+    setChangeToRoute("/session");
+    if (clientToAddOnSessionCreation) {
+      wsClient.sendMessage({
+        type: "AddClientToSession",
+        sessionId: msg.sessionId,
+        addClientId: clientToAddOnSessionCreation
+      });
     }
   };
 
@@ -64,6 +79,9 @@ export const App: React.FC = () => {
   };
 
   wsClient.addMessageHandler("main", onReceiveWebsocketMsg);
+  wsClient.addDisconnectHandler(() => {
+    sessionStorage.removeItem(SESSION_MESSAGES_KEY);
+  });
 
   const onScanClient = (clientId: string | null) => {
     if (clientId) {
@@ -89,6 +107,9 @@ export const App: React.FC = () => {
     const newMsg = mapSessionMsg(serverMsg);
     const newMsgs = sessionMessages.concat([newMsg]);
     setSessionMessages(newMsgs);
+
+    // Save session messages to session storage
+    sessionStorage.setItem(SESSION_MESSAGES_KEY, JSON.stringify(newMsgs));
   };
 
   const onLeaveSession = () => {
