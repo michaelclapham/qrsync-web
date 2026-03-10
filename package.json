@@ -4,17 +4,18 @@
   "private": true,
   "dependencies": {
     "@ionic/react": "^7.7.2",
+    "@ionic/react-router": "7.8.0",
     "@yudiel/react-qr-scanner": "^1.2.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-qr-code": "^2.0.12",
     "react-responsive-carousel": "^3.2.23",
-    "typescript": "^4.9.5",
-    "@ionic/react-router": "7.8.0",
     "react-router": "^5.3.4",
-    "react-router-dom": "^5.3.4"
+    "react-router-dom": "^5.3.4",
+    "typescript": "^4.9.5"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.56",
@@ -23,13 +24,15 @@
     "@types/react-router-dom": "^5.3.3",
     "eslint-utils": "^3.0.0",
     "react-scripts": "^5.0.1",
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "wrangler": "^4.71.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev"
   },
   "eslintConfig": {
     "extends": "react-app"
